@@ -3,47 +3,79 @@
 
 
 /********************************************
-matrix data format,this is just for reference
-
-0x0grb
-
-data type:unsigned short 16bits.
-every 4bits reperesent one color level, so each color
-is with 16 levels.
-*********************************************/
+ * matrix data format,this is just for reference
+ * 
+ * 0x0bgr
+ * 
+ * data type:unsigned short 16bits.
+ * every 4bits reperesent one color level, so each color
+ * is with 16 levels.
+ *********************************************/
 
 //used for displaying
 unsigned short matrixColorData[8][8]= // [line][column]
 {
-		{0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff},//wite
-		{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000},//black
-		{0x000f,0x000d,0x000b,0x0009,0x0007,0x0005,0x0003,0x0001},//blue
-		{0x00ff,0x00dd,0x00bb,0x0099,0x0077,0x0055,0x0033,0x0011},//blue&red
-		{0x00f0,0x00d0,0x00b0,0x0090,0x0070,0x0050,0x0030,0x0010},//red
-                {0x0ff0,0x0dd0,0x0bb0,0x0990,0x0770,0x0750,0x0330,0x0110},//red&green
-		{0x0f00,0x0d00,0x0b00,0x0900,0x0700,0x0500,0x0300,0x0100},//green
-		{0x0f0f,0x0d0d,0x0b0b,0x0909,0x0707,0x0505,0x0303,0x0101},//blue&green
+  {//wite
+    0x0fff,0x0ddd,0x0bbb,0x0999,0x0777,0x0555,0x0333,0x0111      }
+  ,
+  {//black
+    0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000      }
+  ,
+  {//red
+    0x000f,0x000d,0x000b,0x0009,0x0007,0x0005,0x0003,0x0001      }
+  ,
+  {//red&green
+    0x00ff,0x00dd,0x00bb,0x0099,0x0077,0x0055,0x0033,0x0011      }
+  ,
+  {//green
+    0x00f0,0x00d0,0x00b0,0x0090,0x0070,0x0050,0x0030,0x0010      }
+  ,
+  {//blue&green
+    0x0ff0,0x0dd0,0x0bb0,0x0990,0x0770,0x0750,0x0330,0x0110      }
+  ,
+  {//blue
+    0x0f00,0x0d00,0x0b00,0x0900,0x0700,0x0500,0x0300,0x0100      }
+  ,
+  {//blue&red
+    0x0f0f,0x0d0d,0x0b0b,0x0909,0x0707,0x0505,0x0303,0x0101      }
+  ,
 };
 
 //used for receiving color data from serial port,they can be 
 unsigned short serialColorData[8][8] = 
 {
-		{0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff},//wite
-		{0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3},//random
-		{0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f},//blue
-		{0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff},//blue&red
-		{0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0},//red
-                {0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0},//red&green
-		{0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00},//green
-		{0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f},//blue&green
+  {//wite
+    0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff      }
+  ,
+  {//random
+    0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3      }
+  ,
+  {//red
+    0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f      }
+  ,
+  {//red&green
+    0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff      }
+  ,
+  {//green
+    0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0      }
+  ,
+  {//blue&green
+    0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0      }
+  ,
+  {//blue
+    0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00      }
+  ,
+  {//blue&red
+    0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f      }
+  ,
 };
 //= //Timer1 interuption service routine=========================================
 ISR(TIMER1_OVF_vect)         
 {
   static unsigned char line=0,level=0;
-  
+
   flash_line(line,level);
-  
+
   line++;
   if(line>7)
   {
@@ -53,37 +85,36 @@ ISR(TIMER1_OVF_vect)
     {
       level=0;
     }
-  }
-  
+  }  
   //wait for serial data, and saved to serialColorData[][]
   getSerialData();
-  
+
 }
 
 /**********************************************
-Get led matrix data from serial,
-data format:
-4 bytes a group:--line(1byte),column(1btye),color(2byte)
-color format:--0x0grb,low byte first
-***********************************************/
+ * Get led matrix data from serial,
+ * data format:
+ * 4 bytes a group:--line(1byte),column(1btye),color(2byte)
+ * color format:--0x0bgr,low byte first
+ ***********************************************/
 void getSerialData()
 {
   int len = 0;
   unsigned char line = 0;
   unsigned char column = 0;
   unsigned short color = 0;
-  
+
   len =Serial.available();
-  
+
   if(len >= 4)
   {
     //Serial.println(len);
     line = Serial.read();
     column = Serial.read();
-    unsigned char low = Serial.read();//low 8bits first
-    unsigned short high = Serial.read();//high 8bits later
+    unsigned char low = Serial.read();//low 8bits first   (0xgr)
+    unsigned short high = Serial.read();//high 8bits later  (0x0b)
     color = (high<<8)|low;
-    
+
     if(line < 8 & line >= 0 & column < 8 & column >= 0)
     {
       serialColorData[line][column] = color;
@@ -116,48 +147,54 @@ void flash_line(unsigned char line,unsigned char level)
   enable_oe;
 }
 
-//one line with 8 rgb data,so totally 8x3=24 bits
+//one line with 8 rgb data,so totally 8x3=24 bits. Data format:0x0bgr
 void shift_24_bit(unsigned char line,unsigned char level)
 {
   unsigned char column=0;
   unsigned char g=0,r=0,b=0;
   le_high;
-     //Serial.println(matrixColorData[0][0],HEX);
-    for(column=0;column<8;column++)
-    {
-      g=(matrixColorData[line][column]&0x0fff)>>8;
-	  
-      if(g>level) {shift_1_bit(1);}
-      else {shift_1_bit(0);}  //gray scale,11100000b always light
-      
-    }
 
-    for(column=0;column<8;column++)
-    {
-      r=(matrixColorData[line][column]&0x00FF)>>4;
-      if(level <4)
-      {
-      		if(r>level) {shift_1_bit(1);}
-                else {shift_1_bit(0);}  //gray scale,00011000 always light
-      	}
-	else
-	{
-		if(r>(level-4)) {shift_1_bit(1);}
-                else {shift_1_bit(0);}  //gray scale,00011000 always light
-	}
-      
-    }
+  //Output G0~G8
+  for(column=0;column<8;column++)
+  {
+    g=(matrixColorData[line][column]&0x00FF)>>4;
 
-    for(column=0;column<8;column++)
-    {
-      b=matrixColorData[line][column]&0x000f;
-	  
-      if(b>level) {shift_1_bit(1);}
-      else {shift_1_bit(0);}  //gray scale,00000111 always light
-      
+    if(g>level) {
+      shift_1_bit(1);
     }
-		
-   le_low;
+    else {
+      shift_1_bit(0);
+    }  //gray scale,11100000b always light
+
+  }
+  //Output R0~R8
+  for(column=0;column<8;column++)
+  {
+    r=matrixColorData[line][column]&0x000f;
+
+    if(r>level) {
+      shift_1_bit(1);
+    }
+    else {
+      shift_1_bit(0);
+    }  //gray scale,00011000 always light
+
+  }
+  //Output B0~B8
+  for(column=0;column<8;column++)
+  {
+    b=(matrixColorData[line][column]&0x0fff)>>8;
+
+    if(b>level) {
+      shift_1_bit(1);
+    }
+    else {
+      shift_1_bit(0);
+    }  //gray scale,00000111 always light
+
+  }
+
+  le_low;
 }
 
 //open the specific line
@@ -208,7 +245,8 @@ void open_line(unsigned char line)
   }
 }
 //======================================================================
-Rainbow::Rainbow(){}
+Rainbow::Rainbow(){
+}
 
 //invoke initIO and initTimer1
 void Rainbow::init(void)
@@ -271,24 +309,24 @@ void Rainbow::closeOneDot(unsigned char line, unsigned char column)
 void Rainbow::closeOneDiagonal(unsigned char line, unsigned char type)
 {
   int num = 0;//number of lighting leds     
-  
+
   if(LEFT_BOTTOM_TO_RIGHT_TOP == type)  
   {
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][k+8-num] = 0;
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-k-1][k] = 0;
-     }
+      }
     }
   }
   else if(LEFT_TOP_TO_RIGHT_BOTTOM == type)
@@ -296,24 +334,24 @@ void Rainbow::closeOneDiagonal(unsigned char line, unsigned char type)
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-1-k][7-k] = 0;
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][num-1-k] = 0;
-     }
+      }
     }
   }
 }
-  
-  
+
+
 //light all with one color
 void Rainbow::lightAll(unsigned short colorData)
 {
@@ -337,7 +375,7 @@ void Rainbow::lightOneLine(unsigned char line, unsigned short color,unsigned cha
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
   for(int k = 0; k < 8; k++)
     matrixColorData[line][k] = color;
@@ -349,9 +387,9 @@ void Rainbow::lightOneLine(unsigned char line, unsigned short color[8],unsigned 
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-  
+
   for(int k = 0; k < 8; k++)
     matrixColorData[line][k] = color[k];
 }
@@ -363,9 +401,9 @@ void Rainbow::lightOneColumn(unsigned char column, unsigned short color,unsigned
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-        
+
   for(int k = 0; k < 8; k++)
     matrixColorData[k][column] = color;  
 }
@@ -377,9 +415,9 @@ void Rainbow::lightOneColumn(unsigned char column, unsigned short color[8],unsig
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-        
+
   for(int k = 0; k < 8; k++)
     matrixColorData[k][column] = color[k];  
 
@@ -392,9 +430,9 @@ void Rainbow::lightOneColumn(unsigned char column, unsigned short color[8][8],un
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-        
+
   for(int k = 0; k < 8; k++)
     matrixColorData[k][column] = color[k][column];  
 }
@@ -406,9 +444,9 @@ void Rainbow::lightOneDot(unsigned char line,unsigned char column, unsigned shor
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-        
+
   matrixColorData[line][column] = color;
 }
 
@@ -419,29 +457,29 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-  
+
   int num = 0;//number of lighting leds     
-  
+
   if(LEFT_BOTTOM_TO_RIGHT_TOP == type)  
   {
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][k+8-num] = color;
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-k-1][k] = color;
-     }
+      }
     }
   }
   else if(LEFT_TOP_TO_RIGHT_BOTTOM == type)
@@ -449,19 +487,19 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-1-k][7-k] = color;
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][num-1-k] = color;
-     }
+      }
     }
   }
 }
@@ -473,29 +511,29 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-  
+
   int num = 0;//number of lighting leds     
-  
+
   if(LEFT_BOTTOM_TO_RIGHT_TOP == type)  
   {
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][k+8-num] = color[k];
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-k-1][k] = color[k];
-     }
+      }
     }
   }
   else if(LEFT_TOP_TO_RIGHT_BOTTOM == type)
@@ -503,19 +541,19 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-1-k][7-k] = color[k];
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][num-1-k] = color[k];
-     }
+      }
     }
   }
 
@@ -524,33 +562,33 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
 //only light one diagonal line with serialColorData colors
 void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color[8][8],unsigned char othersState)
 {
-    if(OTHERS_OFF == othersState)
+  if(OTHERS_OFF == othersState)
   {
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 8; j++)    
-          matrixColorData[i][j] = 0;
+        matrixColorData[i][j] = 0;
   }
-  
+
   int num = 0;//number of lighting leds     
-  
+
   if(LEFT_BOTTOM_TO_RIGHT_TOP == type)  
   {
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][k+8-num] = color[7-k][k+8-num];
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-k-1][k] = color[num-k-1][k];
-     }
+      }
     }
   }
   else if(LEFT_TOP_TO_RIGHT_BOTTOM == type)
@@ -558,23 +596,26 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
     if(line&0x08)//line = 8...15
     {
       num = 15 - line;
-     for(int k = 0; k < num; k++)
-     {
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[num-1-k][7-k] = color[num-1-k][7-k];
-     }
+      }
     }
     else//line = 0...7
     {
       num = line + 1;
-      
-     for(int k = 0; k < num; k++)
-     {
+
+      for(int k = 0; k < num; k++)
+      {
         matrixColorData[7-k][num-1-k] = color[7-k][num-1-k];
-     }
+      }
     }
   }
 
 }
+
+
+
 
 
 
