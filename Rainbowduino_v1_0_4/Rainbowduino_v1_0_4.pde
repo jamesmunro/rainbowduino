@@ -1,6 +1,6 @@
 #include "Rainbow.h"
 
-//color data format :0x0grb
+//color data format :0x0bgr
 unsigned short color[8] = {WHITE,RED,GREEN,RANDOM,BLUE,YELLOW,AQUA,VIOLET};
 
 //preinstantiate Rainbow object
@@ -19,13 +19,13 @@ void loop()
     /**The following is just some demo to test Ranibow class,you can add more **********/
     
     //just display the static led matrix,which can display the color data received from serial
-    //myRainbow.lightAll(serialColorData);
+    myRainbow.lightAll(serialColorData);
     
     //flash led matrix in several patterns, 
     //flashMatrixDemo(color);
     
     //light 12v led strip in 0~9 number way
-    static int colorNum = 0;
+    /*static int colorNum = 0;
     for(int i = 0; i < 10; i++)
     {
       delay(1000);
@@ -33,7 +33,7 @@ void loop()
       LightLedStripNumberDemo(i,color[colorNum]);
     }
     if(++colorNum == 8) colorNum = 0;
-    
+    */
 }
 //===============================================================
 

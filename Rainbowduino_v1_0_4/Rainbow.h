@@ -59,15 +59,15 @@ void shift_24_bit(unsigned char line,unsigned char level);
 //open the specific line
 void open_line(unsigned char line);
 //===============================================
-//0x0grb
-#define RED 0x00f0
-#define GREEN 0x0f00
-#define BLUE 0x000f
+//0x0bgr
+#define RED 0x000f
+#define GREEN 0x00f0
+#define BLUE 0x0f00
 #define BLACK 0x0000
 #define WHITE 0x0fff
-#define VIOLET 0x00ff
-#define YELLOW 0x0ff0
-#define AQUA  0x0f0f
+#define VIOLET 0x0f0f
+#define YELLOW 0x00ff
+#define AQUA  0x0ff0
 #define RANDOM 0x5e3
 
 //diagonal type
