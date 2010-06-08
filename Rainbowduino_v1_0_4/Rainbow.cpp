@@ -1,126 +1,9 @@
 #include "Rainbow.h"
 #include "WProgram.h"
+#include "data.h"
+#include <avr/pgmspace.h>
 
 
-/********************************************
- * matrix data format,this is just for reference
- * 
- * 0x0bgr
- * 
- * data type:unsigned short 16bits.
- * every 4bits reperesent one color level, so each color
- * is with 16 levels.
- *********************************************/
-
-//used for displaying
-unsigned short matrixColorData[8][8]= // [line][column]
-{
-  {//wite
-    0x0fff,0x0ddd,0x0bbb,0x0999,0x0777,0x0555,0x0333,0x0111      }
-  ,
-  {//black
-    0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000      }
-  ,
-  {//red
-    0x000f,0x000d,0x000b,0x0009,0x0007,0x0005,0x0003,0x0001      }
-  ,
-  {//red&green
-    0x00ff,0x00dd,0x00bb,0x0099,0x0077,0x0055,0x0033,0x0011      }
-  ,
-  {//green
-    0x00f0,0x00d0,0x00b0,0x0090,0x0070,0x0050,0x0030,0x0010      }
-  ,
-  {//blue&green
-    0x0ff0,0x0dd0,0x0bb0,0x0990,0x0770,0x0750,0x0330,0x0110      }
-  ,
-  {//blue
-    0x0f00,0x0d00,0x0b00,0x0900,0x0700,0x0500,0x0300,0x0100      }
-  ,
-  {//blue&red
-    0x0f0f,0x0d0d,0x0b0b,0x0909,0x0707,0x0505,0x0303,0x0101      }
-  ,
-};
-
-//used for receiving color data from serial port,they can be 
-unsigned short serialColorData[8][8] = 
-{
-  {//wite
-    0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff      }
-  ,
-  {//random
-    0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3,0x05e3      }
-  ,
-  {//red
-    0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f,0x000f      }
-  ,
-  {//red&green
-    0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff      }
-  ,
-  {//green
-    0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0,0x00f0      }
-  ,
-  {//blue&green
-    0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0,0x0ff0      }
-  ,
-  {//blue
-    0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00,0x0f00      }
-  ,
-  {//blue&red
-    0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f,0x0f0f      }
-  ,
-};
-//= //Timer1 interuption service routine=========================================
-ISR(TIMER1_OVF_vect)         
-{
-  static unsigned char line=0,level=0;
-
-  flash_line(line,level);
-
-  line++;
-  if(line>7)
-  {
-    line=0;
-    level++;
-    if(level>15)
-    {
-      level=0;
-    }
-  }  
-  //wait for serial data, and saved to serialColorData[][]
-  getSerialData();
-
-}
-
-/**********************************************
- * Get led matrix data from serial,
- * data format:
- * 4 bytes a group:--line(1byte),column(1btye),color(2byte)
- * color format:--0x0bgr,low byte first
- ***********************************************/
-void getSerialData()
-{
-  int len = 0;
-  unsigned char line = 0;
-  unsigned char column = 0;
-  unsigned short color = 0;
-
-  len =Serial.available();
-
-  if(len >= 4)
-  {
-    //Serial.println(len);
-    line = Serial.read();
-    column = Serial.read();
-    unsigned char low = Serial.read();//low 8bits first   (0xgr)
-    unsigned short high = Serial.read();//high 8bits later  (0x0b)
-    color = (high<<8)|low;
-
-    if(line < 8 & line >= 0 & column < 8 & column >= 0)
-    {
-      serialColorData[line][column] = color;
-    }
-  }
-}
 //==============================================================
 
 //shift 1 bit to the rgb data driver MBI5168
@@ -613,6 +496,161 @@ void Rainbow::lightOneDiagonal(unsigned char line, unsigned char type, unsigned 
   }
 
 }
+
+//shift pic 
+void Rainbow::shiftPic(unsigned char shift,unsigned short colorData[8][8])
+{
+  int i,j;
+  unsigned char shiftDirection = shift>>6;//high 2 bits repersent shift direction:0-left,1-right,2-up,3-down
+  unsigned char offset = shift&0x0F;//low 4 bits repersent shift offset
+  //Serial.println(shiftDirection,DEC);
+  if(offset > 8)//offset should be no more than 8
+      return;
+
+  switch (shiftDirection){
+  case LEFT:
+    {//shift left
+      for(i = 0; i < 8; i++){
+        for(j = 0; j < (8-offset); j++){
+          matrixColorData[i][j] = colorData[i][j+offset];
+        }
+        for(j = (8-offset); j < 8; j++){
+          matrixColorData[i][j] = 0;
+        }
+      }
+      break;
+    }
+  case RIGHT:
+    {//shift right
+      for(int i = 0; i < 8; i++){
+        for(j = 0; j < offset; j++){
+          matrixColorData[i][j] = 0;
+        }
+        for(j = offset; j < 8; j++){
+          matrixColorData[i][j] = colorData[i][j-offset];
+        }
+      }
+      break;
+    }
+  case UP:
+    {//shift up
+      for(int i = 0; i < (8-offset) ; i++){
+        for(j = 0; j < 8; j++){
+          matrixColorData[i][j] = colorData[i+offset][j];
+        }
+      }
+      for(int i = (8-offset); i < 8 ; i++){
+        for(j = 0; j < 8; j++){
+          matrixColorData[i][j] = 0;
+        }
+      }
+      break;
+    }
+  case DOWN:
+    {//shift down
+      for(int i = 0; i < offset; i++){
+        for(j = 0; j < 8; j++){
+          matrixColorData[i][j] = 0;
+        }
+      }
+      for(int i = offset; i < 8 ; i++){
+        for(j = 0; j < 8; j++){
+          matrixColorData[i][j] = colorData[i-offset][j];
+        }
+      }
+      break;
+    }
+  default:
+    break;
+  }
+}
+  
+//disp picture preset in the flash with specific index and shift position
+void Rainbow::dispPresetPic(unsigned char shift,unsigned char index)
+{
+  int i = 0;
+  int j = 0;
+  
+  //enrich the serialColorData with specific preset matrix color data
+  for(i = 0; i < 8; i++){
+    for(j = 0; j < 8; j++){
+      serialColorData[i][j] = pgm_read_word(&presetMatrixColorData[index][i][j]);
+    }
+  }
+  
+  //shift the pic
+  shiftPic(shift,serialColorData);
+}
+
+//disp character with specific shift position
+void Rainbow::dispChar(unsigned char ASCII,unsigned short color,unsigned char shift)
+{
+  unsigned char index = 0;
+  unsigned char bitMap[8] ;
+  int i = 0;
+  int j = 0;
+  
+  //get the bitmap of the ASCII
+  index = ASCII - 32;//32-> ' '
+  for(i = 0; i < 8; i++){
+      bitMap[i] = pgm_read_byte(&myFont[index][i]);
+    }
+ /* if(ASCII >= '0' && ASCII <= '9'){
+    index = ASCII - '0';
+    for(i = 0; i < 8; i++){
+      bitMap[i] = pgm_read_byte(&ASCII_Number[index][i]);
+    }
+  }
+  else{
+    if(ASCII >= 'A' && ASCII <= 'Z'){
+      index = ASCII - 'A';
+    }
+    else if(ASCII >= 'a' && ASCII <= 'z'){
+      index = ASCII - 'a' + 26;
+    }
+    for(i = 0; i < 8; i++){
+      bitMap[i] = pgm_read_byte(&ASCII_Char[index][i]);
+    }
+  }
+  */
+  //enrich the serialColorData with the color data coresponding to the specific ASCII bitmap
+  /*unsigned char bitPos = 0x01;
+  for(i = 0; i < 8; i++){
+    for(j = 0; j < 8; j++){
+      if(bitMap[7-i]&(bitPos<<j)){
+        serialColorData[i][j] = color;
+      }
+      else{
+        serialColorData[i][j] = 0;
+      }
+    }
+  }
+  */
+  unsigned char bitPos = 0x01;
+  for(j = 0; j < 8; j++){//column first
+    for(i = 0; i < 8; i++){//then line
+      if(bitMap[j]&(bitPos<<i)){
+        serialColorData[i][j] = color;
+      }
+      else{
+        serialColorData[i][j] = 0;
+      }
+    }
+  }
+  
+  //shift the pic
+  shiftPic(shift,serialColorData);
+}
+
+//disp specific color
+void Rainbow::dispColor(unsigned short color)
+{
+  lightAll(color);
+}
+
+
+
+
 
 
 

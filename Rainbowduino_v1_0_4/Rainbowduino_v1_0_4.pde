@@ -1,4 +1,12 @@
 #include "Rainbow.h"
+#include "Interface.h"
+#include <NewSoftSerial.h>
+#include <EEPROM.h>
+#include <Wire.h>
+#include <avr/pgmspace.h>
+
+//for receive color data from serial port
+extern unsigned short serialColorData[8][8];//defined in data.h
 
 //color data format :0x0bgr
 unsigned short color[8] = {WHITE,RED,GREEN,RANDOM,BLUE,YELLOW,AQUA,VIOLET};
@@ -6,20 +14,29 @@ unsigned short color[8] = {WHITE,RED,GREEN,RANDOM,BLUE,YELLOW,AQUA,VIOLET};
 //preinstantiate Rainbow object
 Rainbow myRainbow = Rainbow();
 
+//preinstantiate Interface object
+Interface myInterface = Interface();
+
+//Join I2C bus as master or slave
+#define I2C_MASTER
+
+
 //=============================================================
 void setup()
 {
-  Serial.begin(9600);
+  myInterface.init();
   myRainbow.init();
-  myRainbow.closeAll();//close all leds
+  //myRainbow.closeAll();//close all leds
+  //myRainbow.dispChar('1',0x0fff,0);
 }
 
 void loop()
 {
     /**The following is just some demo to test Ranibow class,you can add more **********/
     
+    
     //just display the static led matrix,which can display the color data received from serial
-    myRainbow.lightAll(serialColorData);
+    //myRainbow.lightAll(serialColorData);
     
     //flash led matrix in several patterns, 
     //flashMatrixDemo(color);
@@ -35,9 +52,37 @@ void loop()
     if(++colorNum == 8) colorNum = 0;
     */
 }
-//===============================================================
+
+//= //Timer1 interuption service routine=========================================
+ISR(TIMER1_OVF_vect)         
+{
+  //sweep 8 lines to make led matrix looks stable
+  static unsigned char line=0,level=0;
+
+  flash_line(line,level);
+
+  line++;
+  if(line>7)
+  {
+    line=0;
+    level++;
+    if(level>15)
+    {
+      level=0;
+    }
+  }  
+  
+  //process the interface
+  myInterface.process();
+
+}
+
+/****************************************************************/
 
  //some demo to test rainbow member funtions
+
+/****************************************************************/
+
 void flashMatrixDemo(unsigned short *color)
 {
  int i = 0;
