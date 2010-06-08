@@ -1,11 +1,18 @@
 #ifndef Rainbow_h
 #define Rainbow_h
-
+/*
 //reperesents the 8x8 matrix color data,so just change the coresponding color data
 extern unsigned short matrixColorData[8][8];//defined in data.c
 
 //for receive color data from serial port
-extern unsigned short serialColorData[8][8];//defined in data.c
+extern unsigned short serialColorData[8][8];//defined in data.h
+
+extern unsigned char ASCII_Char[52][8];
+extern unsigned char ASCII_Number[10][8];
+
+
+extern unsigned short presetMatrixColorData[PRESET_PIC_NUM][8][8];
+*/
 
 //=============================================
 //MBI5168
@@ -44,8 +51,6 @@ extern unsigned short serialColorData[8][8];//defined in data.c
 #define close_all_line	{PORTD&=~0xf8;PORTB&=~0x07;}
 //============================================
 
-//Get led matrix data from serial
-void getSerialData();
 
 //shift 1 bit to the rgb data driver MBI5168
 void shift_1_bit(unsigned char LS);
@@ -78,6 +83,13 @@ void open_line(unsigned char line);
 #define OTHERS_ON 1
 #define OTHERS_OFF 0
 
+//shift direction
+#define LEFT   0
+#define RIGHT  1
+#define UP     2
+#define DOWN   3
+
+
 class Rainbow
 {
   public:
@@ -108,9 +120,12 @@ class Rainbow
   void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color,unsigned char othersState);//only light one diagonal line  with one color
   void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short *color,unsigned char othersState);//only light one diagonal line with a number of colors
   void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color[8][8],unsigned char othersState);//only light one diagonal line with serialColorData colors
+    
+  void shiftPic(unsigned char shift,unsigned short colorData[8][8]);//shift pic  
+  void dispPresetPic(unsigned char shift,unsigned char index);//disp picture preset in the flash with specific index and shift position
+  void dispChar(unsigned char ASCII,unsigned short color,unsigned char shift);//disp character with specific shift position
+  void dispColor(unsigned short color);//disp specific color
   
-  //void demoFlash(unsigned short *color);//demo flash
-  //void lightNumber(int num,unsigned short color);//light 0~9
 };
 
 #endif
