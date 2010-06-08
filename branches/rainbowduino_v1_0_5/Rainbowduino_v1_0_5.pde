@@ -27,7 +27,7 @@ void setup()
   myInterface.init();
   myRainbow.init();
   //myRainbow.closeAll();//close all leds
-  //myRainbow.dispChar('1',0x0fff,0);
+  
 }
 
 void loop()
