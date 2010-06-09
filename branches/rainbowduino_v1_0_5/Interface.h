@@ -9,7 +9,9 @@
 #define DISP_PRESET_PIC  0
 #define DISP_CHAR        1
 #define DISP_COLOR       2
-#define DISP_RANDOM      3
+#define SET_DOT          3
+#define DISP_RANDOM      4
+
 #define CHANGE_TO_DATA   'D'
 
 //used for serial interface
@@ -36,6 +38,8 @@ class Interface
   private:
   void processCmd(void);
   void processData(void);
+  unsigned char checkCmd(unsigned char cmd[7]);
+  void resloveCmd(unsigned char cmd[7]);
   
 };
 
