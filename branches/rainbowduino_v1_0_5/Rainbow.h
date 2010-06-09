@@ -1,18 +1,6 @@
 #ifndef Rainbow_h
 #define Rainbow_h
-/*
-//reperesents the 8x8 matrix color data,so just change the coresponding color data
-extern unsigned short matrixColorData[8][8];//defined in data.c
 
-//for receive color data from serial port
-extern unsigned short serialColorData[8][8];//defined in data.h
-
-extern unsigned char ASCII_Char[52][8];
-extern unsigned char ASCII_Number[10][8];
-
-
-extern unsigned short presetMatrixColorData[PRESET_PIC_NUM][8][8];
-*/
 
 //=============================================
 //MBI5168
@@ -93,6 +81,10 @@ void open_line(unsigned char line);
 class Rainbow
 {
   public:
+  //used for receiving color data from serial port,they can be 
+  unsigned short receiveBuffer[8][8];
+  
+  public:
   Rainbow(void);
  
   void init(void);//invoke initIO and initTimer1
@@ -107,26 +99,28 @@ class Rainbow
   
   void lightAll(unsigned short colorData);//light all with one color
   void lightAll(unsigned short colorData[8][8]);//light all with matrix data
+  void lightAll(void);//light all with receiveBuffer
   
   void lightOneLine(unsigned char line, unsigned short color,unsigned char othersState);//only light one line with one color
   void lightOneLine(unsigned char line, unsigned short color[8],unsigned char othersState);//only light one line with 8 colors
   
   void lightOneColumn(unsigned char column, unsigned short color,unsigned char othersState);//only light one column with one color
   void lightOneColumn(unsigned char column, unsigned short color[8],unsigned char othersState);//only light one column with 8 colors
-  void lightOneColumn(unsigned char column, unsigned short color[8][8],unsigned char othersState);//only light one column with serialColorData 8 colors
+  void lightOneColumn(unsigned char column, unsigned short color[8][8],unsigned char othersState);//only light one column with receiveBuffer 8 colors
   
   void lightOneDot(unsigned char line, unsigned char column, unsigned short color,unsigned char othersState);//only light one dot at specific position
   
   void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color,unsigned char othersState);//only light one diagonal line  with one color
   void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short *color,unsigned char othersState);//only light one diagonal line with a number of colors
-  void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color[8][8],unsigned char othersState);//only light one diagonal line with serialColorData colors
+  void lightOneDiagonal(unsigned char line, unsigned char type, unsigned short color[8][8],unsigned char othersState);//only light one diagonal line with receiveBuffer colors
     
   void shiftPic(unsigned char shift,unsigned short colorData[8][8]);//shift pic  
   void dispPresetPic(unsigned char shift,unsigned char index);//disp picture preset in the flash with specific index and shift position
   void dispChar(unsigned char ASCII,unsigned short color,unsigned char shift);//disp character with specific shift position
   void dispColor(unsigned short color);//disp specific color
   
-  void fullfillOneColor(unsigned char color);//fullfill one color(16bits) with conitues color data(8bits)
+  void fillColorBuffer(unsigned char color);//fullfill one color(16bits) with conitues color data(8bits)
+  void fillColorBuffer(unsigned short colorMatrix[8][8]);//fullfill the whole color buffer 
   
 };
 
