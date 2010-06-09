@@ -564,20 +564,20 @@ void Rainbow::shiftPic(unsigned char shift,unsigned short colorData[8][8])
     break;
   }
 }
-  
+
 //disp picture preset in the flash with specific index and shift position
 void Rainbow::dispPresetPic(unsigned char shift,unsigned char index)
 {
   int i = 0;
   int j = 0;
-  
+
   //enrich the serialColorData with specific preset matrix color data
   for(i = 0; i < 8; i++){
     for(j = 0; j < 8; j++){
       serialColorData[i][j] = pgm_read_word(&presetMatrixColorData[index][i][j]);
     }
   }
-  
+
   //shift the pic
   shiftPic(shift,serialColorData);
 }
@@ -589,43 +589,43 @@ void Rainbow::dispChar(unsigned char ASCII,unsigned short color,unsigned char sh
   unsigned char bitMap[8] ;
   int i = 0;
   int j = 0;
-  
+
   //get the bitmap of the ASCII
   index = ASCII - 32;//32-> ' '
   for(i = 0; i < 8; i++){
-      bitMap[i] = pgm_read_byte(&myFont[index][i]);
-    }
- /* if(ASCII >= '0' && ASCII <= '9'){
-    index = ASCII - '0';
-    for(i = 0; i < 8; i++){
-      bitMap[i] = pgm_read_byte(&ASCII_Number[index][i]);
-    }
+    bitMap[i] = pgm_read_byte(&myFont[index][i]);
   }
-  else{
-    if(ASCII >= 'A' && ASCII <= 'Z'){
-      index = ASCII - 'A';
-    }
-    else if(ASCII >= 'a' && ASCII <= 'z'){
-      index = ASCII - 'a' + 26;
-    }
-    for(i = 0; i < 8; i++){
-      bitMap[i] = pgm_read_byte(&ASCII_Char[index][i]);
-    }
-  }
-  */
+  /* if(ASCII >= '0' && ASCII <= '9'){
+   index = ASCII - '0';
+   for(i = 0; i < 8; i++){
+   bitMap[i] = pgm_read_byte(&ASCII_Number[index][i]);
+   }
+   }
+   else{
+   if(ASCII >= 'A' && ASCII <= 'Z'){
+   index = ASCII - 'A';
+   }
+   else if(ASCII >= 'a' && ASCII <= 'z'){
+   index = ASCII - 'a' + 26;
+   }
+   for(i = 0; i < 8; i++){
+   bitMap[i] = pgm_read_byte(&ASCII_Char[index][i]);
+   }
+   }
+   */
   //enrich the serialColorData with the color data coresponding to the specific ASCII bitmap
   /*unsigned char bitPos = 0x01;
-  for(i = 0; i < 8; i++){
-    for(j = 0; j < 8; j++){
-      if(bitMap[7-i]&(bitPos<<j)){
-        serialColorData[i][j] = color;
-      }
-      else{
-        serialColorData[i][j] = 0;
-      }
-    }
-  }
-  */
+   for(i = 0; i < 8; i++){
+   for(j = 0; j < 8; j++){
+   if(bitMap[7-i]&(bitPos<<j)){
+   serialColorData[i][j] = color;
+   }
+   else{
+   serialColorData[i][j] = 0;
+   }
+   }
+   }
+   */
   unsigned char bitPos = 0x01;
   for(j = 0; j < 8; j++){//column first
     for(i = 0; i < 8; i++){//then line
@@ -637,7 +637,7 @@ void Rainbow::dispChar(unsigned char ASCII,unsigned short color,unsigned char sh
       }
     }
   }
-  
+
   //shift the pic
   shiftPic(shift,serialColorData);
 }
@@ -647,6 +647,34 @@ void Rainbow::dispColor(unsigned short color)
 {
   lightAll(color);
 }
+
+//fullfill one color(16bits) with conitues color data(8bits)
+void Rainbow::fullfillOneColor(unsigned char color)
+{
+  static unsigned char colorCnt = 0;
+  static unsigned short colorData = 0;
+  static unsigned char i = 0;
+  static unsigned char j = 0;
+
+  unsigned short t = color;
+  
+  //colorData:0x0bgr
+  colorData |= (t<<(colorCnt*4));
+  colorCnt++;
+  if (3 == colorCnt){
+    colorCnt = 0;
+    serialColorData[i][j++] = colorData;
+    colorData = 0;
+    if(8 == j){
+      j = 0;
+      i++;
+      if(8 == i){
+        i = 0;
+      }
+    }
+  }
+}
+
 
 
 

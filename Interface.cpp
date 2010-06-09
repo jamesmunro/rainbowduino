@@ -6,7 +6,8 @@
 #include <Wire.h>
 
 extern Rainbow myRainbow;
-//extern unsigned short serialColorData[8][8];//defined in data.c
+//for receive color data from serial port
+extern unsigned short serialColorData[8][8];//defined in data.h
 
 Interface::Interface(){
 }
@@ -62,10 +63,57 @@ void Interface::processI2C(void)
 //receive and resolve the command
 void Interface::processCmd(void)
 {
-  static unsigned char cmd[7]={   0,0,0,0,0,0,0    };//'R'+type+shift+red+green+blue+ASCII/index
-  
+  static unsigned char cmd[7]={
+    0,0,0,0,0,0,0  };//'R'+type+shift+red+green+blue+ASCII/index
+  unsigned char receiveOK = 0;
+
+  //check the commmand
+  receiveOK = checkCmd(cmd);
+
+  //reslove the command
+  if(receiveOK){
+    resloveCmd(cmd);
+  }
+}
+
+//receive and process the data
+void Interface::processData(void)
+{
+  //when get 0xAA 0x55,means data transmitting over
+  //Serial.println("ok1");
+  if(Serial.available()){
+    unsigned char t1 = Serial.read();
+    //Serial.println(t1);
+    if(0xAA == t1){
+      char t2;
+      while(1){
+        if(Serial.available()>0){
+          break;
+        }
+      }
+      t2 = Serial.read();
+      //Serial.println(t2);
+      if(0x55 == t2){
+        serialState = COMMAND_MODE;
+        //Serial.println("ok");
+        myRainbow.lightAll(serialColorData);
+      }
+      else{
+        myRainbow.fullfillOneColor(t1);
+        myRainbow.fullfillOneColor(t2);
+        //myRainbow.lightAll(0x0f00);
+      }
+    }
+    else{
+      myRainbow.fullfillOneColor(t1);
+      //myRainbow.lightAll(0x000f);
+    }
+  }
+}
+
+unsigned char Interface::checkCmd(unsigned char cmd[7])
+{
   static unsigned char i = 1;
-  unsigned short color = 0;//0x0bgr
   static unsigned char gotFirstFlag = 0;
   unsigned char receiveOK = 0;
 
@@ -86,47 +134,81 @@ void Interface::processCmd(void)
       }
     }
   }
-  //reslove command
-  if(receiveOK){
-    unsigned char shift = cmd[2];
-    unsigned char red = cmd[3];
-    unsigned char green = cmd[4];
-    unsigned char blue = cmd[5];
-    unsigned char ASCII = cmd[6];//case cmd is ASCII
-    unsigned char index = cmd[6];//case cmd is preset picture
-    color = blue;
-    color = (color<<8)|(green<<4)|red;
-    switch (cmd[1]){
-    case DISP_PRESET_PIC:
-      {
-        myRainbow.dispPresetPic(shift,index);
-        break;
-      }
-    case DISP_CHAR:
-      {
-        myRainbow.dispChar(ASCII,color,shift);
-        break;
-      }
-    case DISP_COLOR:
-      {
-        myRainbow.dispColor(color);
-        break;
-      }
-    case CHANGE_TO_DATA:
-      {
-        serialState = DATA_MODE;
-        break;
-      }
-    default:
+  return receiveOK;
+}
+//this to be done?????????????????????????
+void Interface::resloveCmd(unsigned char cmd[7])
+{
+  unsigned char shift = 0;
+  unsigned char red = 0;
+  unsigned char green = 0;
+  unsigned char blue = 0;
+  unsigned char ASCII = 0;
+  unsigned char index = 0;
+  unsigned short color = 0;//0x0bgr;
+
+  switch (cmd[1]){
+  case DISP_PRESET_PIC:
+    {
+      shift = cmd[2];
+      index = cmd[6];
+      myRainbow.dispPresetPic(shift,index);
       break;
     }
+  case DISP_CHAR:
+    {
+
+      shift = cmd[2];
+      red = cmd[3];
+      green = cmd[4];
+      blue = cmd[5];
+      ASCII = cmd[6];
+      color = blue;//0x0bgr;
+      color = (color<<8)|(green<<4)|red;
+      myRainbow.dispChar(ASCII,color,shift);
+      break;
+    }
+  case DISP_COLOR:
+    {
+      red = cmd[3];
+      green = cmd[4];
+      blue = cmd[5];
+      ASCII = cmd[6];
+      color = blue;//0x0bgr;
+      color = (color<<8)|(green<<4)|red;
+
+      myRainbow.dispColor(color);
+      break;
+    }
+  case SET_DOT:
+    {
+      unsigned char line = cmd[2];
+      unsigned char column = cmd[3];
+      red = cmd[4];
+      green = cmd[5];
+      blue = cmd[6];
+      color = blue;//0x0bgr;
+      color = (color<<8)|(green<<4)|red;
+
+      myRainbow.lightOneDot(line,column,color,OTHERS_ON);
+      break;
+    }
+  case DISP_RANDOM:
+    {
+      break;
+    }
+  case CHANGE_TO_DATA:
+    {
+      serialState = DATA_MODE;
+      break;
+    }
+  default:
+    break;
   }
+
 }
 
-//receive and process the data
-void Interface::processData(void)
-{
-}
+
 
 
 

@@ -33,7 +33,7 @@ void setup()
 void loop()
 {
     /**The following is just some demo to test Ranibow class,you can add more **********/
-    
+    myInterface.process();
     
     //just display the static led matrix,which can display the color data received from serial
     //myRainbow.lightAll(serialColorData);
@@ -72,8 +72,8 @@ ISR(TIMER1_OVF_vect)
     }
   }  
   
-  //process the interface
-  myInterface.process();
+  //process the interface,be carefull:should not be here if it is too large -by Icing 2010/6/9 1:02
+  //myInterface.process(); 
 
 }
 
@@ -82,7 +82,7 @@ ISR(TIMER1_OVF_vect)
  //some demo to test rainbow member funtions
 
 /****************************************************************/
-
+/*
 void flashMatrixDemo(unsigned short *color)
 {
  int i = 0;
@@ -221,7 +221,7 @@ void flashMatrixDemo(unsigned short *color)
     if(8 == ++k) k = 0;
   }
 }
-
+*/
 /***********************************************************
 function: light 12v led strip in the way of number 0~9 
 (http://www.seeedstudio.com/depot/3w-rgb-led-strip-common-anode-12v-p-351.html?cPath=32_21)

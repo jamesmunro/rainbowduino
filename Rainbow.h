@@ -126,6 +126,8 @@ class Rainbow
   void dispChar(unsigned char ASCII,unsigned short color,unsigned char shift);//disp character with specific shift position
   void dispColor(unsigned short color);//disp specific color
   
+  void fullfillOneColor(unsigned char color);//fullfill one color(16bits) with conitues color data(8bits)
+  
 };
 
 #endif
