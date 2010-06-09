@@ -1,13 +1,15 @@
 #include "WProgram.h"
 #include "Interface.h"
 #include "Rainbow.h"
-#include <NewSoftSerial.h>
-#include <EEPROM.h>
+#include "Demos.h"
 #include <Wire.h>
 
 extern Rainbow myRainbow;
+
+extern unsigned char demoIndex;
+
 //for receive color data from serial port
-extern unsigned short serialColorData[8][8];//defined in data.h
+extern unsigned short receiveBuffer[8][8];//defined in data.h
 
 Interface::Interface(){
 }
@@ -64,7 +66,7 @@ void Interface::processI2C(void)
 void Interface::processCmd(void)
 {
   static unsigned char cmd[7]={
-    0,0,0,0,0,0,0  };//'R'+type+shift+red+green+blue+ASCII/index
+    0,0,0,0,0,0,0    };//'R'+type+shift+red+green+blue+ASCII/index
   unsigned char receiveOK = 0;
 
   //check the commmand
@@ -80,10 +82,8 @@ void Interface::processCmd(void)
 void Interface::processData(void)
 {
   //when get 0xAA 0x55,means data transmitting over
-  //Serial.println("ok1");
   if(Serial.available()){
     unsigned char t1 = Serial.read();
-    //Serial.println(t1);
     if(0xAA == t1){
       char t2;
       while(1){
@@ -92,21 +92,17 @@ void Interface::processData(void)
         }
       }
       t2 = Serial.read();
-      //Serial.println(t2);
       if(0x55 == t2){
         serialState = COMMAND_MODE;
-        //Serial.println("ok");
-        myRainbow.lightAll(serialColorData);
+        myRainbow.lightAll();
       }
       else{
-        myRainbow.fullfillOneColor(t1);
-        myRainbow.fullfillOneColor(t2);
-        //myRainbow.lightAll(0x0f00);
+        myRainbow.fillColorBuffer(t1);
+        myRainbow.fillColorBuffer(t2);
       }
     }
     else{
-      myRainbow.fullfillOneColor(t1);
-      //myRainbow.lightAll(0x000f);
+      myRainbow.fillColorBuffer(t1);
     }
   }
 }
@@ -136,7 +132,7 @@ unsigned char Interface::checkCmd(unsigned char cmd[7])
   }
   return receiveOK;
 }
-//this to be done?????????????????????????
+//reslove all kinds of command
 void Interface::resloveCmd(unsigned char cmd[7])
 {
   unsigned char shift = 0;
@@ -147,6 +143,8 @@ void Interface::resloveCmd(unsigned char cmd[7])
   unsigned char index = 0;
   unsigned short color = 0;//0x0bgr;
 
+  demoIndex = 255;//means not run demo
+  
   switch (cmd[1]){
   case DISP_PRESET_PIC:
     {
@@ -194,7 +192,8 @@ void Interface::resloveCmd(unsigned char cmd[7])
       break;
     }
   case DISP_RANDOM:
-    {
+    {//not implement yet
+      demoIndex = cmd[2];
       break;
     }
   case CHANGE_TO_DATA:
@@ -207,6 +206,7 @@ void Interface::resloveCmd(unsigned char cmd[7])
   }
 
 }
+
 
 
 
