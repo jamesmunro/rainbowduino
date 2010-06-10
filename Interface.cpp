@@ -9,7 +9,7 @@ extern Rainbow myRainbow;
 extern unsigned char demoIndex;
 
 //for receive color data from serial port
-extern unsigned short receiveBuffer[8][8];//defined in data.h
+//extern unsigned short receiveBuffer[8][8];//defined in data.h
 
 Interface::Interface(){
 }

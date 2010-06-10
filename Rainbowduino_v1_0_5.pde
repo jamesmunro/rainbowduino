@@ -4,8 +4,6 @@
 #include <Wire.h>
 #include <avr/pgmspace.h>
 
-//void (*f) (void) = NULL; /* 声明一个函数指针 */
-
 unsigned char demoIndex = 0;//255 represents choose no demo
 unsigned char cmdArrived = 0;//is command arrived,1-yes,0-no
 
