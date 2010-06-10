@@ -4,10 +4,32 @@
 
 extern Rainbow myRainbow;
 extern unsigned short color[8];
-//extern void (*f) (void); 
+extern unsigned char cmdArrived;
+extern unsigned char demoIndex ;//255 represents choose no demo
+
+//run the specific demo 
+void runDemo()
+{
+    switch (demoIndex){
+  case 0:
+    {
+      flashMatrixDemo();//flash led matrix in several patterns, 
+      break;
+    }
+  case 1:
+    {
+      lightLedStripNumberDemo();//light 12v led strip in 0~9 number way
+      break;
+    }
+  default: 
+    break;
+  }
+}
+
+
 /****************************************************************/
 
- //some demos to test rainbow member funtions
+ //some demos to test rainbow member funtions, you can add more
 
 /****************************************************************/
 
@@ -19,6 +41,7 @@ void flashMatrixDemo(void)
  //all with the same color
  for(i = 0; i < 8; i++)
  {
+   checkReturn(cmdArrived);
    delay(200);
    myRainbow.lightAll(color[i]);
  }
@@ -26,6 +49,7 @@ void flashMatrixDemo(void)
  //sweep one line while others off
  for(i = 0; i < 8; i++)
  {
+   checkReturn(cmdArrived);
    delay(100);
    //myRainbow.lightOneLine(i,color[i],OTHERS_OFF);
    myRainbow.lightOneLine(i,myRainbow.receiveBuffer[i],OTHERS_OFF);
@@ -34,6 +58,7 @@ void flashMatrixDemo(void)
  //sweep one line while others on
  for(i = 7; i >= 0; i--)
  {
+   checkReturn(cmdArrived);
    delay(100);
    //myRainbow.lightOneLine(i,color[i],OTHERS_ON);
    myRainbow.lightOneLine(i,myRainbow.receiveBuffer[i],OTHERS_ON);
@@ -42,6 +67,7 @@ void flashMatrixDemo(void)
  //sweep one column while others off
  for(i = 0; i < 8; i++)
  {
+   checkReturn(cmdArrived);
    delay(100);
    //myRainbow.lightOneColumn(i,color[i],OTHERS_OFF);
    myRainbow.lightOneColumn(i,myRainbow.receiveBuffer,OTHERS_OFF);
@@ -50,6 +76,7 @@ void flashMatrixDemo(void)
  //sweep one colum while others on
  for(i = 7; i >= 0; i--)
  {
+   checkReturn(cmdArrived);
    delay(100);
    //myRainbow.lightOneColumn(i,color[i],OTHERS_ON);
    myRainbow.lightOneColumn(i,myRainbow.receiveBuffer,OTHERS_ON);
@@ -59,6 +86,7 @@ void flashMatrixDemo(void)
  for(i = 0; i < 8; i++)
    for(j = 0;j < 8; j++)
    {
+     checkReturn(cmdArrived);
      delay(50);
      //myRainbow.lightOneDot(i,j,color[j],OTHERS_OFF);
      myRainbow.lightOneDot(i,j,myRainbow.receiveBuffer[i][j],OTHERS_OFF);
@@ -68,6 +96,7 @@ void flashMatrixDemo(void)
  for(i = 7; i >= 0; i--)
    for(j = 7;j >= 0; j--)
    {
+     checkReturn(cmdArrived);
      delay(50);
      //myRainbow.lightOneDot(i,j,color[j],OTHERS_ON);
      myRainbow.lightOneDot(i,j,myRainbow.receiveBuffer[i][j],OTHERS_ON);
@@ -76,6 +105,7 @@ void flashMatrixDemo(void)
   //sweep the diagonal line from top left to riht bottom while others off
   for(i = 0; i < 16; i++)
   {
+    checkReturn(cmdArrived);
     delay(100);
     //myRainbow.lightOneDiagonal(i,LEFT_BOTTOM_TO_RIGHT_TOP,color[i&0x07],OTHERS_OFF);
     myRainbow.lightOneDiagonal(i,LEFT_BOTTOM_TO_RIGHT_TOP,myRainbow.receiveBuffer,OTHERS_OFF);
@@ -84,6 +114,7 @@ void flashMatrixDemo(void)
   //sweep the diagonal line from riht bottom to top left while others on
   for(i = 15; i >= 0; i--)
   {
+    checkReturn(cmdArrived);
     delay(100);
     //myRainbow.lightOneDiagonal(i,LEFT_BOTTOM_TO_RIGHT_TOP,color[i&0x07],OTHERS_ON);
     myRainbow.lightOneDiagonal(i,LEFT_BOTTOM_TO_RIGHT_TOP,myRainbow.receiveBuffer,OTHERS_ON);
@@ -92,6 +123,7 @@ void flashMatrixDemo(void)
   //sweep the diagonal line from bottom left to riht top while others off
   for(i = 0; i < 16; i++)
   {
+    checkReturn(cmdArrived);
     delay(100);
     //myRainbow.lightOneDiagonal(i,LEFT_TOP_TO_RIGHT_BOTTOM,color[i&0x07],OTHERS_OFF);
     myRainbow.lightOneDiagonal(i,LEFT_TOP_TO_RIGHT_BOTTOM,myRainbow.receiveBuffer,OTHERS_OFF);
@@ -100,12 +132,14 @@ void flashMatrixDemo(void)
   //sweep the diagonal line from riht top to bottom left while others on
   for(i = 15; i >= 0; i--)
   {
+    checkReturn(cmdArrived);
     delay(100);
     //myRainbow.lightOneDiagonal(i,LEFT_TOP_TO_RIGHT_BOTTOM,color[i&0x07],OTHERS_ON);
     myRainbow.lightOneDiagonal(i,LEFT_TOP_TO_RIGHT_BOTTOM,myRainbow.receiveBuffer,OTHERS_ON);
   }
   
   //sweep 1/4 part of matrix
+  checkReturn(cmdArrived);
   delay(200);
   static int k = 0;
   
@@ -119,7 +153,8 @@ void flashMatrixDemo(void)
       }
     }
     if(8 == ++k) k = 0;
-  
+    
+    checkReturn(cmdArrived);
     delay(500);
     for(i = 0; i < 4; i++)
     {
@@ -129,6 +164,8 @@ void flashMatrixDemo(void)
       }
     }
     if(8 == ++k) k = 0;
+    
+    checkReturn(cmdArrived);
     delay(500);
     for(i = 0; i < 4; i++)
     {
@@ -138,6 +175,8 @@ void flashMatrixDemo(void)
       }
     }
     if(8 == ++k) k = 0;
+    
+    checkReturn(cmdArrived);
     delay(500);
     for(i = 0; i < 4; i++)
     {
@@ -157,6 +196,7 @@ void lightLedStripNumberDemo(void)
     static int colorNum = 0;
     for(int i = 0; i < 10; i++)
     {
+      checkReturn(cmdArrived);
       delay(1000);
       //display 0~9 with specific color
       lightLedStripNumber(i,color[colorNum]);

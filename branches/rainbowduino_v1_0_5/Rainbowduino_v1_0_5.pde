@@ -6,7 +6,8 @@
 
 //void (*f) (void) = NULL; /* 声明一个函数指针 */
 
-unsigned char demoIndex = 255;
+unsigned char demoIndex = 0;//255 represents choose no demo
+unsigned char cmdArrived = 0;//is command arrived,1-yes,0-no
 
 //color data format :0x0bgr
 unsigned short color[8] = {
@@ -33,23 +34,11 @@ void setup()
 
 void loop()
 {
-  /**The following is just some demo to test Ranibow class,you can add more **********/
+  //process the interface
   myInterface.process();
 
-  switch (demoIndex){
-  case 0:
-    {
-      flashMatrixDemo();//flash led matrix in several patterns, 
-      break;
-    }
-  case 1:
-    {
-      lightLedStripNumberDemo();//light 12v led strip in 0~9 number way
-      break;
-    }
-  default: 
-    break;
-  }
+  //run the specific demo if we get runDemo command
+  runDemo();
 
 
 }
@@ -72,10 +61,11 @@ ISR(TIMER1_OVF_vect)
       level=0;
     }
   }  
-
-  //process the interface,be carefull:should not be here if it is too large -by Icing 2010/6/9 1:02
-  //myInterface.process(); 
-
+ 
+ //check if there's data availabe from serial port, set a flag, and then process it in the loop
+ if(Serial.available()){
+   cmdArrived = 1;
+ }
 }
 
 
